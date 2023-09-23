@@ -36,7 +36,7 @@ export class AudioHandler {
 		}
 
 		const formData = new FormData();
-		formData.append("file", blob, fileName);
+		formData.append("audio_file", blob, fileName);
 		formData.append("model", this.plugin.settings.model);
 		formData.append("language", this.plugin.settings.language);
 
@@ -68,7 +68,7 @@ export class AudioHandler {
 				return;
 			}
 
-			console.log("Audio data sent successfully:", response.data.text);
+			console.log("Audio data sent successfully:", response.data);
 
 			// Determine if a new file should be created
 			const activeView =
@@ -79,7 +79,7 @@ export class AudioHandler {
 			if (shouldCreateNewFile) {
 				await this.plugin.app.vault.create(
 					noteFilePath,
-					`![[${audioFilePath}]]\n${response.data.text}`
+					`![[${audioFilePath}]]\n${response.data}`
 				);
 				await this.plugin.app.workspace.openLinkText(
 					noteFilePath,
@@ -94,12 +94,12 @@ export class AudioHandler {
 					)?.editor;
 				if (editor) {
 					const cursorPosition = editor.getCursor();
-					editor.replaceRange(response.data.text, cursorPosition);
+					editor.replaceRange(response.data, cursorPosition);
 
 					// Move the cursor to the end of the inserted text
 					const newPosition = {
 						line: cursorPosition.line,
-						ch: cursorPosition.ch + response.data.text.length,
+						ch: cursorPosition.ch + response.data.length,
 					};
 					editor.setCursor(newPosition);
 				}
